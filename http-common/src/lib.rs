@@ -3,14 +3,19 @@
 #![deny(rust_2018_idioms, warnings)]
 #![deny(clippy::all, clippy::pedantic)]
 #![allow(
+	clippy::default_trait_access,
+	clippy::let_and_return,
 	clippy::missing_errors_doc,
 	clippy::module_name_repetitions,
+	clippy::must_use_candidate,
 	clippy::similar_names,
 	clippy::type_complexity,
 )]
 
 mod connector;
-pub use connector::{ AsyncStream, Connector, ConnectorError, Stream };
+pub use connector::{AsyncStream, Connector, ConnectorError, Stream};
+
+pub mod server;
 
 /// Ref <https://url.spec.whatwg.org/#path-percent-encode-set>
 pub const PATH_SEGMENT_ENCODE_SET: &percent_encoding::AsciiSet =
