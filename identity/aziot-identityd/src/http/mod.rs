@@ -6,6 +6,7 @@ mod create_or_list_module_identity;
 mod get_device_identity;
 mod get_caller_identity;
 mod reprovision_device;
+mod create_principal;
 
 pub(crate) struct Server {
 	pub(crate) inner: std::sync::Arc<futures_util::lock::Mutex<aziot_identityd::Server>>,
@@ -40,6 +41,7 @@ impl hyper::service::Service<hyper::Request<hyper::Body>> for Server {
 				get_device_identity::handle,
 				get_caller_identity::handle,
 				reprovision_device::handle,
+				create_principal::handle,
 			];
 
 			log::debug!("Received request {:?}", req);
