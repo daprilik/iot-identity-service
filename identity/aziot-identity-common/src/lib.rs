@@ -15,6 +15,7 @@ pub struct GenId(pub String);
 #[serde(tag = "type", content = "spec")]
 pub enum Identity {
     Aziot(AzureIoTSpec),
+    Local(LocalIdSpec),
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -29,6 +30,20 @@ pub struct AzureIoTSpec {
     pub gen_id: Option<GenId>,
     #[serde(rename = "auth", skip_serializing_if = "Option::is_none")]
     pub auth: Option<AuthenticationInfo>,
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+pub struct LocalIdSpec {
+    pub attributes: LocalIdAttributes,
+    pub issuer: String,
+    pub auth: AuthenticationInfo,
+}
+
+#[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum LocalIdAttributes {
+    Client,
+    Server,
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
@@ -70,7 +85,7 @@ pub struct IoTHubDevice {
 #[derive(Clone)]
 pub enum Credentials {
 	SharedPrivateKey (String),
-	
+
     X509 {
         identity_cert: String,
         identity_pk: String,
@@ -80,14 +95,14 @@ pub enum Credentials {
 impl From<Credentials> for AuthenticationInfo {
     fn from(c: Credentials) -> Self {
 		match c {
-		    Credentials::SharedPrivateKey(k) => AuthenticationInfo { 
+		    Credentials::SharedPrivateKey(k) => AuthenticationInfo {
 				auth_type: AuthenticationType::SaS,
-				key_handle: aziot_key_common::KeyHandle(k), 
+				key_handle: aziot_key_common::KeyHandle(k),
 				cert_id: None,
 			},
-		    Credentials::X509 { identity_cert, identity_pk } => AuthenticationInfo { 
+		    Credentials::X509 { identity_cert, identity_pk } => AuthenticationInfo {
 				auth_type: AuthenticationType::X509,
-				key_handle: aziot_key_common::KeyHandle(identity_pk), 
+				key_handle: aziot_key_common::KeyHandle(identity_pk),
 				cert_id: Some(identity_cert),
 			},
 		}

@@ -33,6 +33,7 @@ pub struct Server {
 	pub authenticator: Box<dyn auth::authentication::Authenticator<Error = Error>  + Send + Sync>,
 	pub authorizer: Box<dyn auth::authorization::Authorizer<Error = Error>  + Send + Sync>,
 	pub hub_id_manager: identity::hub::IdentityManager,
+	pub local_id_manager: identity::local::IdentityManager,
 
 	key_client: std::sync::Arc<aziot_key_client_async::Client>,
 	key_engine: std::sync::Arc<futures_util::lock::Mutex<openssl2::FunctionalEngine>>,
@@ -72,11 +73,18 @@ impl Server {
 
 		let hub_id_manager = identity::hub::IdentityManager::new(key_client.clone(), key_engine.clone(), cert_client.clone(), None);
 
+		let local_id_manager = identity::local::IdentityManager::new(
+			key_client.clone(),
+			key_engine.clone(),
+			cert_client.clone()
+		);
+
 		Ok(Server {
 			settings,
 			authenticator,
 			authorizer,
 			hub_id_manager,
+			local_id_manager,
 
 			key_client,
 			key_engine,
@@ -92,13 +100,18 @@ impl Server {
 
 		self.hub_id_manager.get_device_identity().await
 	}
-	pub async fn get_identity(&self, auth_id: auth::AuthId, _idtype: &str, module_id: &str) -> Result<aziot_identity_common::Identity, Error> {
+
+	pub async fn get_identity(&self, auth_id: auth::AuthId, idtype: &str, module_id: &str) -> Result<aziot_identity_common::Identity, Error> {
 
 		if !self.authorizer.authorize(auth::Operation{auth_id, op_type: auth::OperationType::GetModule(String::from(module_id)) })? {
 			return Err(Error::Authorization);
 		}
 
-		self.hub_id_manager.get_module_identity(module_id).await
+		match idtype {
+			"aziot" => self.hub_id_manager.get_module_identity(module_id).await,
+			"local" => self.local_id_manager.get_local_identity(module_id).await,
+			_ => Err(Error::invalid_parameter("id_type", "invalid id_type"))
+		}
 	}
 
 	pub async fn get_identities(&self, auth_id: auth::AuthId, id_type: &str) -> Result<Vec<aziot_identity_common::Identity>, Error> {
@@ -182,7 +195,10 @@ impl Server {
 					else {
 						log::warn!("invalid identity type returned by get_module_identities");
 					}
-				}
+				},
+				aziot_identity_common::Identity::Local(_l) => {
+					log::warn!("placeholder");
+				},
 			}
 		}
 

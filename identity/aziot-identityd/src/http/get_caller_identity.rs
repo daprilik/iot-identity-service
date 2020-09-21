@@ -46,7 +46,7 @@ impl http_common::server::Route for Route {
 				Err(err) => return Err(super::to_http_error(&err)),
 			};
 			let res = aziot_identity_common_http::get_module_identity::Response {
-				identity,
+				identity: vec![identity],
 			};
 			Ok((hyper::StatusCode::OK, res))
 		})
