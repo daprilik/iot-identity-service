@@ -33,7 +33,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
             let () = std::fs::create_dir_all(&homedir_path).map_err(aziot_identityd::error::InternalError::CreateHomeDir)?;
     }
 
-    let (_pmap, module_set) = convert_to_map(&settings.principal);
+    let (_pmap, _module_set) = convert_to_map(&settings.principal);
 
     let authenticator = Box::new(|_| Ok(aziot_identityd::auth::AuthId::Unknown));
 
@@ -52,7 +52,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         log::info!("Provisioning complete.");
 
         let curr_device_info_state = aziot_identityd::settings::DeviceInfo { hub_name: device.iothub_hostname, device_id: device.device_id };
-
+        /*
         if prev_device_info_path.exists() {
             let prev_device_info_state = aziot_identityd::settings::DeviceInfo::new(&prev_device_info_path)?;
 
@@ -67,7 +67,7 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         log::info!("Identity reconciliation complete.");
-
+        */
         let curr_device_info_state = toml::to_string(&curr_device_info_state)?;
         std::fs::write(prev_device_info_path, curr_device_info_state).map_err(aziot_identityd::error::InternalError::SaveDeviceInfo)?;
         std::fs::copy(config_file, prev_settings_path).map_err(aziot_identityd::error::InternalError::SaveSettings)?;
