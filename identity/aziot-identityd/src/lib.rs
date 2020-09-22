@@ -383,9 +383,9 @@ impl Server {
 			},
 			settings::ProvisioningType::None => {
 				let device = aziot_identity_common::IoTHubDevice {
-					iothub_hostname: "none".to_owned(),
-					device_id: "none".to_owned(),
-					credentials: aziot_identity_common::Credentials::SharedPrivateKey("none".to_owned()),
+					iothub_hostname: "gowa-local-id-mqtt-server".to_owned(),
+					device_id: "gowa-local-id-mqtt-server".to_owned(),
+					credentials: aziot_identity_common::Credentials::SharedPrivateKey("gowa-local-id-mqtt-server".to_owned()),
 				};
 
 				self.hub_id_manager.set_device(&device);
