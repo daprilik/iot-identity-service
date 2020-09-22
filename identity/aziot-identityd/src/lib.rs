@@ -378,7 +378,14 @@ impl Server {
 					}
 				};
 				device
-			}
+			},
+			settings::ProvisioningType::None => {
+				aziot_identity_common::IoTHubDevice {
+					iothub_hostname: "none".to_owned(),
+					device_id: "none".to_owned(),
+					credentials: aziot_identity_common::Credentials::SharedPrivateKey("none".to_owned()),
+				}
+			},
 		};
 		Ok(device)
 	}

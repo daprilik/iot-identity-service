@@ -138,6 +138,7 @@ pub enum ProvisioningType {
         scope_id: String,
         attestation: DpsAttestationMethod,
     },
+    None,
 }
 
 #[derive(Clone, Debug, serde::Deserialize, serde::Serialize)]
