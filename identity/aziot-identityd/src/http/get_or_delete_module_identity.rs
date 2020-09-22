@@ -70,17 +70,20 @@ impl http_common::server::Route for Route {
 			};
 
 			//TODO: get uid from UDS
-			let hub_identity = match inner.get_identity(auth_id.clone(), "aziot", &self.module_id).await {
-				Ok(v) => v,
-				Err(err) => return Err(super::to_http_error(&err)),
+			let mut result = vec![];
+
+			match inner.get_identity(auth_id.clone(), "aziot", &self.module_id).await {
+				Ok(v) => result.push(v),
+				Err(_err) => (),//return Err(super::to_http_error(&err)),
 			};
-			let local_identity = match inner.get_identity(auth_id, "local", &self.module_id).await {
-				Ok(v) => v,
+
+			match inner.get_identity(auth_id, "local", &self.module_id).await {
+				Ok(v) => result.push(v),
 				Err(err) => return Err(super::to_http_error(&err)),
 			};
 
 			let res = aziot_identity_common_http::get_module_identity::Response {
-				identity: vec![hub_identity, local_identity],
+				identity: result,
 			};
 			Ok((hyper::StatusCode::OK, res))
 		})
