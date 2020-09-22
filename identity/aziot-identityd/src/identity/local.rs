@@ -24,14 +24,13 @@ impl IdentityManager {
 	}
 
 	pub async fn get_local_identity(&self, _module_id: &str) -> Result<aziot_identity_common::Identity, Error> {
-
 		Ok(aziot_identity_common::Identity::Local(aziot_identity_common::LocalIdSpec {
 			attributes: aziot_identity_common::LocalIdAttributes::Server,
 			issuer: "local-id-issuer".to_owned(),
 			auth: aziot_identity_common::AuthenticationInfo {
 				auth_type: aziot_identity_common::AuthenticationType::X509,
-				key_handle: aziot_key_common::KeyHandle("local-id-server".to_owned()),
-				cert_id: Some("local-id-server".to_owned()),
+				key_handle: aziot_key_common::KeyHandle("mqtt-server".to_owned()),
+				cert_id: Some("mqtt-server".to_owned()),
 			}
 		}))
 	}

@@ -107,6 +107,8 @@ impl Server {
 			return Err(Error::Authorization);
 		}
 
+		let _cert = self.create_identity_cert_if_not_exist_or_expired("mqtt-server", "mqtt-server", "mqtt-server").await?;
+
 		match idtype {
 			"aziot" => self.hub_id_manager.get_module_identity(module_id).await,
 			"local" => self.local_id_manager.get_local_identity(module_id).await,
